@@ -1,0 +1,27 @@
+#include "stm32f4xx.h"
+
+void delay(volatile int count)
+{
+    while (count--);
+}
+
+int main(void)
+{
+    RCC->AHB1ENR |= (1 << 0);
+    RCC->AHB1ENR |= (1 << 2);
+    GPIOA->MODER &= ~(3 << (5 * 2));
+    GPIOA->MODER |=  (1 << (5 * 2));
+    GPIOC->MODER &= ~(3 << (13 * 2));
+    GPIOC->PUPDR &= ~(3 << (13 * 2));
+    GPIOC->PUPDR |=  (1 << (13 * 2));
+    while (1)
+    {
+        if (!(GPIOC->IDR & (1 << 13)))
+        {
+            GPIOA->ODR ^= (1 << 5);
+            delay(10000);
+            while (!(GPIOC->IDR & (1 << 13)));
+        }
+    }
+}
+
